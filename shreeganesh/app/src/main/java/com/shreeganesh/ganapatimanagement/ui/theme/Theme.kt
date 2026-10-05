@@ -9,35 +9,56 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = SaffronLight,
+    onPrimary = Color.Black,
+    primaryContainer = SaffronContainerDark,
+    onPrimaryContainer = SaffronLight,
+    secondary = GoldLight,
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF423000),
+    onSecondaryContainer = GoldLight,
+    tertiary = VermilionRed,
+    onTertiary = Color.White,
+    background = FestiveBackgroundDark,
+    onBackground = TextPrimaryDark,
+    surface = FestiveSurfaceDark,
+    onSurface = TextPrimaryDark,
+    surfaceVariant = FestiveSurfaceVariantDark,
+    onSurfaceVariant = TextSecondaryDark,
+    outline = FestiveBorderDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = SaffronPrimary,
     onPrimary = Color.White,
-    onSecondary = Color.White,
+    primaryContainer = SaffronContainer,
+    onPrimaryContainer = SaffronDeep,
+    secondary = MarigoldGold,
+    onSecondary = Color.Black,
+    secondaryContainer = GoldContainer,
+    onSecondaryContainer = Color(0xFF5D4200),
+    tertiary = VermilionRed,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiaryContainer = VermilionContainer,
+    onTertiaryContainer = VermilionDeep,
+    background = FestiveBackgroundLight,
+    onBackground = TextPrimaryLight,
+    surface = FestiveSurfaceLight,
+    onSurface = TextPrimaryLight,
+    surfaceVariant = FestiveSurfaceVariantLight,
+    onSurfaceVariant = TextSecondaryLight,
+    outline = FestiveBorderLight
 )
 
 @Composable
 fun GanapatiManagementTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Keep dynamicColor false by default to preserve the auspicious Ganapati festive palette
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
