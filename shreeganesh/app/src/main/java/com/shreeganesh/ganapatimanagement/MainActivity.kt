@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.shreeganesh.ganapatimanagement.ui.screens.home.HomeScreen
+import com.shreeganesh.ganapatimanagement.ui.GanapatiApp
 import com.shreeganesh.ganapatimanagement.ui.theme.GanapatiManagementTheme
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GanapatiManagementTheme {
-                HomeScreen()
+                GanapatiApp()
             }
         }
     }
@@ -23,8 +23,8 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MainDashboardPreview() {
+fun MainAppPreview() {
     GanapatiManagementTheme {
-        HomeScreen()
+        GanapatiApp()
     }
 }

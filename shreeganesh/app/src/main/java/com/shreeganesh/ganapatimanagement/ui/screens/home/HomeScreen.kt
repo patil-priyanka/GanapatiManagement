@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -51,6 +54,13 @@ import com.shreeganesh.ganapatimanagement.ui.theme.MarigoldGold
 import com.shreeganesh.ganapatimanagement.ui.theme.SaffronDeep
 import com.shreeganesh.ganapatimanagement.ui.theme.SaffronPrimary
 import kotlinx.coroutines.launch
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.clickable
+import com.shreeganesh.ganapatimanagement.ui.theme.TextPrimaryLight
+import com.shreeganesh.ganapatimanagement.ui.theme.TextSecondaryLight
 
 @Composable
 fun HomeScreen(
@@ -60,7 +70,8 @@ fun HomeScreen(
     onNavigateToExpenses: () -> Unit = {},
     onNavigateToMembers: () -> Unit = {},
     onNavigateToTasks: () -> Unit = {},
-    onNavigateToEvents: () -> Unit = {}
+    onNavigateToEvents: () -> Unit = {},
+    onNavigateToAarti: (String?) -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -82,14 +93,20 @@ fun HomeScreen(
                 currentTab = selectedTab,
                 onTabSelected = { tab ->
                     selectedTab = tab
-                    showMessage("${tab.marathiTitle} विभाग निवडला")
+                    if (tab == DashboardTab.Finance) {
+                        onNavigateToDonations()
+                    } else if (tab == DashboardTab.Events) {
+                        onNavigateToAarti(null)
+                    } else {
+                        showMessage("${tab.marathiTitle} विभाग निवडला")
+                    }
                 }
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    showMessage("नवीन देणगी किंवा खर्च नोंदवा")
+                    onNavigateToDonations()
                 },
                 containerColor = SaffronPrimary,
                 contentColor = Color.White,
@@ -152,7 +169,92 @@ fun HomeScreen(
                 }
             }
 
-            // 3. Important Announcement Banner
+            // 3. Dedicated Offline Aarti Quick Banner
+            item {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(18.dp))
+                            .clickable { onNavigateToAarti(null) },
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9F0)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                        border = CardDefaults.outlinedCardBorder().copy(
+                            brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                listOf(MarigoldGold, SaffronPrimary)
+                            )
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(46.dp)
+                                    .background(SaffronPrimary, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "🪔",
+                                    fontSize = 24.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "ऑफलाइन आरती संग्रह",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextPrimaryLight
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Surface(
+                                        color = SaffronDeep,
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text(
+                                            text = "ऑडिओ",
+                                            color = Color.White,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = "सुखकर्ता दुःखहर्ता व सर्व ६ आरत्या ऑडिओसह ऐका",
+                                    fontSize = 11.sp,
+                                    color = TextSecondaryLight,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+
+                            Surface(
+                                shape = CircleShape,
+                                color = SaffronDeep,
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "▶",
+                                        color = Color.White,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 4. Important Announcement Banner
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     AnnouncementBanner(
@@ -163,7 +265,7 @@ fun HomeScreen(
                 }
             }
 
-            // 4. Quick Action Modules (6 cards)
+            // 5. Quick Action Modules (6 cards)
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     QuickActionsSection(
@@ -173,7 +275,7 @@ fun HomeScreen(
                                 "expenses" -> onNavigateToExpenses()
                                 "members" -> onNavigateToMembers()
                                 "tasks" -> onNavigateToTasks()
-                                "events" -> onNavigateToEvents()
+                                "events" -> onNavigateToAarti(null)
                                 else -> {}
                             }
                             showMessage("${action.marathiTitle} विभाग उघडत आहे...")
@@ -182,16 +284,15 @@ fun HomeScreen(
                 }
             }
 
-            // 5. Today's Aarti & Schedule Timeline
+            // 6. Today's Aarti & Schedule Timeline
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     TodayScheduleSection(
                         onViewAllClick = {
-                            onNavigateToEvents()
-                            showMessage("सर्व कार्यक्रम वेळापत्रक")
+                            onNavigateToAarti(null)
                         },
                         onEventClick = { event ->
-                            showMessage("${event.marathiTitle} • वेळ: ${event.time}")
+                            onNavigateToAarti(event.id)
                         }
                     )
                 }
