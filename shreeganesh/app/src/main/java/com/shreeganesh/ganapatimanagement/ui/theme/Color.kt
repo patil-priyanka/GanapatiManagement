@@ -12,6 +12,7 @@ val SaffronContainerDark = Color(0xFF4A1800)
 
 // Sacred Gold & Marigold Yellow
 val MarigoldGold = Color(0xFFFFB300)
+
 val GoldLight = Color(0xFFFFD54F)
 val GoldContainer = Color(0xFFFFF8E1)
 
@@ -47,3 +48,4 @@ val TextTertiaryLight = Color(0xFF9E826C)
 val TextPrimaryDark = Color(0xFFFFF3E6)
 val TextSecondaryDark = Color(0xFFD7C2B0)
 val TextTertiaryDark = Color(0xFFA6907E)
+val MarigoldWarm = Color(0xFFA6907E)

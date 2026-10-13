@@ -96,7 +96,9 @@ fun HomeScreen(
                     if (tab == DashboardTab.Finance) {
                         onNavigateToDonations()
                     } else if (tab == DashboardTab.Events) {
-                        onNavigateToAarti(null)
+                        onNavigateToEvents()
+                    } else if (tab == DashboardTab.Committee) {
+                        onNavigateToMembers()
                     } else {
                         showMessage("${tab.marathiTitle} विभाग निवडला")
                     }
@@ -275,7 +277,7 @@ fun HomeScreen(
                                 "expenses" -> onNavigateToExpenses()
                                 "members" -> onNavigateToMembers()
                                 "tasks" -> onNavigateToTasks()
-                                "events" -> onNavigateToAarti(null)
+                                "events" -> onNavigateToEvents()
                                 else -> {}
                             }
                             showMessage("${action.marathiTitle} विभाग उघडत आहे...")
@@ -289,7 +291,7 @@ fun HomeScreen(
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     TodayScheduleSection(
                         onViewAllClick = {
-                            onNavigateToAarti(null)
+                            onNavigateToEvents()
                         },
                         onEventClick = { event ->
                             onNavigateToAarti(event.id)
