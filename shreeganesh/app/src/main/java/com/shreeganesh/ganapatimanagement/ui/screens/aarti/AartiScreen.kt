@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shreeganesh.ganapatimanagement.audio.AartiAudioEngine
 import com.shreeganesh.ganapatimanagement.model.AartiItem
-import com.shreeganesh.ganapatimanagement.model.getAartiPlaylist
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBackgroundLight
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBorderLight
 import com.shreeganesh.ganapatimanagement.ui.theme.GanapatiManagementTheme
@@ -96,19 +95,35 @@ import kotlinx.coroutines.launch
 @Composable
 fun AartiScreen(
     modifier: Modifier = Modifier,
+    aartiList: List<AartiItem> = emptyList(),
     initialAartiId: String? = null,
     onBackClick: () -> Unit = {}
 ) {
-    val playlist = remember { getAartiPlaylist() }
-    val initialIndex = remember(initialAartiId) {
+    if (aartiList.isEmpty()) {
+        Box(
+            modifier = modifier.fillMaxSize().background(FestiveBackgroundLight),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "आरती संग्रह लोड होत आहे...",
+                color = SaffronDeep,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+        }
+        return
+    }
+
+    val playlist = aartiList
+    val initialIndex = remember(initialAartiId, playlist) {
         if (initialAartiId != null) {
             val found = playlist.indexOfFirst { it.id == initialAartiId }
             if (found >= 0) found else 0
         } else 0
     }
 
-    var selectedIndex by remember { mutableIntStateOf(initialIndex) }
-    val currentAarti = playlist[selectedIndex]
+    var selectedIndex by remember(playlist) { mutableIntStateOf(initialIndex.coerceIn(0, playlist.size - 1)) }
+    val currentAarti = playlist[selectedIndex.coerceIn(0, playlist.size - 1)]
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }

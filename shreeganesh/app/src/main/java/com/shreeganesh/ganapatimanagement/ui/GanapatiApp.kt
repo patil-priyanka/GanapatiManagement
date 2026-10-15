@@ -1,29 +1,24 @@
 package com.shreeganesh.ganapatimanagement.ui
 
+import android.app.Application
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.shreeganesh.ganapatimanagement.model.Donation
-import com.shreeganesh.ganapatimanagement.model.Expense
-import com.shreeganesh.ganapatimanagement.model.FestivalSummary
-import com.shreeganesh.ganapatimanagement.model.KaryakramItem
-import com.shreeganesh.ganapatimanagement.model.Member
-import com.shreeganesh.ganapatimanagement.model.getSampleDonations
-import com.shreeganesh.ganapatimanagement.model.getSampleExpenses
-import com.shreeganesh.ganapatimanagement.model.getSampleKaryakramList
-import com.shreeganesh.ganapatimanagement.model.getSampleMembers
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shreeganesh.ganapatimanagement.ui.screens.aarti.AartiScreen
 import com.shreeganesh.ganapatimanagement.ui.screens.donation.DonationScreen
 import com.shreeganesh.ganapatimanagement.ui.screens.expense.ExpenseScreen
 import com.shreeganesh.ganapatimanagement.ui.screens.home.HomeScreen
 import com.shreeganesh.ganapatimanagement.ui.screens.karyakram.KaryakramScreen
 import com.shreeganesh.ganapatimanagement.ui.screens.member.MemberScreen
+import com.shreeganesh.ganapatimanagement.ui.viewmodel.GanapatiViewModel
 
 sealed interface Screen {
     object Home : Screen
@@ -38,26 +33,19 @@ sealed interface Screen {
 fun GanapatiApp(modifier: Modifier = Modifier) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
-    // Shared in-memory list of donations, expenses, members & festival schedule
-    val donationsList = remember { mutableStateListOf<Donation>().apply { addAll(getSampleDonations()) } }
-    val expensesList = remember { mutableStateListOf<Expense>().apply { addAll(getSampleExpenses()) } }
-    val membersList = remember { mutableStateListOf<Member>().apply { addAll(getSampleMembers()) } }
-    val karyakramList = remember { mutableStateListOf<KaryakramItem>().apply { addAll(getSampleKaryakramList()) } }
+    val context = LocalContext.current.applicationContext as Application
+    val viewModel: GanapatiViewModel = viewModel(factory = GanapatiViewModel.Factory(context))
 
-    // Dynamically calculate summary stats based on current donations, expenses and members
-    val currentTotalDonation = donationsList.sumOf { it.amount }
-    val currentDonorCount = donationsList.size
-    val currentTotalExpense = expensesList.sumOf { it.amount }
-    val currentVolunteerCount = membersList.size
-
-    val festivalSummary = remember(currentTotalDonation, currentDonorCount, currentTotalExpense, currentVolunteerCount) {
-        FestivalSummary(
-            totalDonation = currentTotalDonation,
-            donorCount = currentDonorCount,
-            totalExpense = currentTotalExpense,
-            volunteerCount = currentVolunteerCount
-        )
-    }
+    // Real-time Database state observed via StateFlow
+    val donationsList by viewModel.donations.collectAsState()
+    val expensesList by viewModel.expenses.collectAsState()
+    val membersList by viewModel.members.collectAsState()
+    val karyakramList by viewModel.karyakramList.collectAsState()
+    val aartiList by viewModel.aartis.collectAsState()
+    val announcement by viewModel.announcement.collectAsState()
+    val festivalSummary by viewModel.festivalSummary.collectAsState()
+    val recentActivities by viewModel.recentActivities.collectAsState()
+    val todaySchedule by viewModel.todaySchedule.collectAsState()
 
     Crossfade(targetState = currentScreen, label = "screenTransition") { screen ->
         when (screen) {
@@ -65,6 +53,9 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 HomeScreen(
                     modifier = modifier,
                     summary = festivalSummary,
+                    announcement = announcement,
+                    recentActivities = recentActivities,
+                    todaySchedule = todaySchedule,
                     onNavigateToDonations = {
                         currentScreen = Screen.Donations
                     },
@@ -73,6 +64,9 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                     },
                     onNavigateToMembers = {
                         currentScreen = Screen.Members
+                    },
+                    onNavigateToTasks = {
+                        currentScreen = Screen.Karyakram
                     },
                     onNavigateToEvents = {
                         currentScreen = Screen.Karyakram
@@ -89,13 +83,15 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 }
                 DonationScreen(
                     modifier = modifier,
-                    initialDonations = donationsList,
+                    donations = donationsList,
+                    onAddDonation = { newDonation ->
+                        viewModel.addDonation(newDonation)
+                    },
+                    onDeleteDonation = { donationId ->
+                        viewModel.deleteDonation(donationId)
+                    },
                     onBackClick = {
                         currentScreen = Screen.Home
-                    },
-                    onDonationListUpdated = { updatedList ->
-                        donationsList.clear()
-                        donationsList.addAll(updatedList)
                     }
                 )
             }
@@ -106,13 +102,15 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 }
                 ExpenseScreen(
                     modifier = modifier,
-                    initialExpenses = expensesList,
+                    expenses = expensesList,
+                    onAddExpense = { newExpense ->
+                        viewModel.addExpense(newExpense)
+                    },
+                    onDeleteExpense = { expenseId ->
+                        viewModel.deleteExpense(expenseId)
+                    },
                     onBackClick = {
                         currentScreen = Screen.Home
-                    },
-                    onExpenseListUpdated = { updatedList ->
-                        expensesList.clear()
-                        expensesList.addAll(updatedList)
                     }
                 )
             }
@@ -123,13 +121,15 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 }
                 MemberScreen(
                     modifier = modifier,
-                    initialMembers = membersList,
+                    members = membersList,
+                    onAddMember = { newMember ->
+                        viewModel.addMember(newMember)
+                    },
+                    onDeleteMember = { memberId ->
+                        viewModel.deleteMember(memberId)
+                    },
                     onBackClick = {
                         currentScreen = Screen.Home
-                    },
-                    onMemberListUpdated = { updatedList ->
-                        membersList.clear()
-                        membersList.addAll(updatedList)
                     }
                 )
             }
@@ -140,13 +140,18 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 }
                 KaryakramScreen(
                     modifier = modifier,
-                    initialKaryakramList = karyakramList,
+                    karyakramList = karyakramList,
+                    onAddKaryakram = { newItem ->
+                        viewModel.addKaryakram(newItem)
+                    },
+                    onUpdateKaryakramStatus = { id, status ->
+                        viewModel.updateKaryakramStatus(id, status)
+                    },
+                    onDeleteKaryakram = { itemId ->
+                        viewModel.deleteKaryakram(itemId)
+                    },
                     onBackClick = {
                         currentScreen = Screen.Home
-                    },
-                    onKaryakramListUpdated = { updatedList ->
-                        karyakramList.clear()
-                        karyakramList.addAll(updatedList)
                     },
                     onPlayAarti = { aartiId ->
                         currentScreen = Screen.Aarti(aartiId)
@@ -160,6 +165,7 @@ fun GanapatiApp(modifier: Modifier = Modifier) {
                 }
                 AartiScreen(
                     modifier = modifier,
+                    aartiList = aartiList,
                     initialAartiId = screen.aartiId,
                     onBackClick = {
                         currentScreen = Screen.Home

@@ -69,7 +69,6 @@ import com.shreeganesh.ganapatimanagement.model.Donation
 import com.shreeganesh.ganapatimanagement.model.DonationCategory
 import com.shreeganesh.ganapatimanagement.model.DonationStats
 import com.shreeganesh.ganapatimanagement.model.PaymentMode
-import com.shreeganesh.ganapatimanagement.model.getSampleDonations
 import com.shreeganesh.ganapatimanagement.ui.theme.DonationGreen
 import com.shreeganesh.ganapatimanagement.ui.theme.DonationGreenContainer
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBackgroundLight
@@ -90,11 +89,11 @@ import java.util.Locale
 @Composable
 fun DonationScreen(
     modifier: Modifier = Modifier,
-    initialDonations: List<Donation> = remember { getSampleDonations() },
-    onBackClick: () -> Unit = {},
-    onDonationListUpdated: (List<Donation>) -> Unit = {}
+    donations: List<Donation> = emptyList(),
+    onAddDonation: (Donation) -> Unit = {},
+    onDeleteDonation: (String) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
-    val donations = remember { mutableStateListOf<Donation>().apply { addAll(initialDonations) } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -373,8 +372,7 @@ fun DonationScreen(
             nextReceiptNumber = nextNumber,
             onDismissRequest = { showAddDonationSheet = false },
             onDonationAdded = { newDonation ->
-                donations.add(0, newDonation)
-                onDonationListUpdated(donations)
+                onAddDonation(newDonation)
                 showAddDonationSheet = false
                 selectedDonationForReceipt = newDonation
                 showMessage("पावती क्र. #${newDonation.receiptNumber} यशस्वीरित्या नोंदवली गेली!")

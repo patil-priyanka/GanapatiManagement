@@ -64,7 +64,6 @@ import com.shreeganesh.ganapatimanagement.model.Expense
 import com.shreeganesh.ganapatimanagement.model.ExpenseCategory
 import com.shreeganesh.ganapatimanagement.model.ExpenseStats
 import com.shreeganesh.ganapatimanagement.model.PaymentMode
-import com.shreeganesh.ganapatimanagement.model.getSampleExpenses
 import com.shreeganesh.ganapatimanagement.ui.theme.ExpenseRed
 import com.shreeganesh.ganapatimanagement.ui.theme.ExpenseRedContainer
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBackgroundLight
@@ -81,11 +80,11 @@ import java.util.Locale
 @Composable
 fun ExpenseScreen(
     modifier: Modifier = Modifier,
-    initialExpenses: List<Expense> = remember { getSampleExpenses() },
-    onBackClick: () -> Unit = {},
-    onExpenseListUpdated: (List<Expense>) -> Unit = {}
+    expenses: List<Expense> = emptyList(),
+    onAddExpense: (Expense) -> Unit = {},
+    onDeleteExpense: (String) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
-    val expenses = remember { mutableStateListOf<Expense>().apply { addAll(initialExpenses) } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -352,8 +351,7 @@ fun ExpenseScreen(
             nextVoucherNumber = nextNumber,
             onDismissRequest = { showAddExpenseSheet = false },
             onExpenseAdded = { newExpense ->
-                expenses.add(0, newExpense)
-                onExpenseListUpdated(expenses)
+                onAddExpense(newExpense)
                 showAddExpenseSheet = false
                 selectedExpenseForVoucher = newExpense
                 showMessage("व्हाऊचर #${newExpense.voucherNumber} यशस्वीरित्या जतन झाले!")

@@ -69,7 +69,6 @@ import com.shreeganesh.ganapatimanagement.model.Member
 import com.shreeganesh.ganapatimanagement.model.MemberDepartment
 import com.shreeganesh.ganapatimanagement.model.MemberRole
 import com.shreeganesh.ganapatimanagement.model.MemberStats
-import com.shreeganesh.ganapatimanagement.model.getSampleMembers
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBackgroundLight
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBorderLight
 import com.shreeganesh.ganapatimanagement.ui.theme.GanapatiManagementTheme
@@ -87,11 +86,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MemberScreen(
     modifier: Modifier = Modifier,
-    initialMembers: List<Member> = remember { getSampleMembers() },
-    onBackClick: () -> Unit = {},
-    onMemberListUpdated: (List<Member>) -> Unit = {}
+    members: List<Member> = emptyList(),
+    onAddMember: (Member) -> Unit = {},
+    onDeleteMember: (String) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
-    val members = remember { mutableStateListOf<Member>().apply { addAll(initialMembers) } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -344,8 +343,7 @@ fun MemberScreen(
         AddMemberBottomSheet(
             onDismissRequest = { showAddMemberSheet = false },
             onMemberAdded = { newMember ->
-                members.add(0, newMember)
-                onMemberListUpdated(members)
+                onAddMember(newMember)
                 showAddMemberSheet = false
                 selectedMemberForDetails = newMember
                 showMessage("${newMember.name} यांची नोंदणी यशस्वी झाली!")

@@ -62,10 +62,17 @@ import androidx.compose.foundation.clickable
 import com.shreeganesh.ganapatimanagement.ui.theme.TextPrimaryLight
 import com.shreeganesh.ganapatimanagement.ui.theme.TextSecondaryLight
 
+import com.shreeganesh.ganapatimanagement.model.AartiEvent
+import com.shreeganesh.ganapatimanagement.model.AnnouncementItem
+import com.shreeganesh.ganapatimanagement.model.RecentActivity
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     summary: FestivalSummary = FestivalSummary(),
+    announcement: AnnouncementItem? = null,
+    recentActivities: List<RecentActivity> = emptyList(),
+    todaySchedule: List<AartiEvent> = emptyList(),
     onNavigateToDonations: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
     onNavigateToMembers: () -> Unit = {},
@@ -257,13 +264,16 @@ fun HomeScreen(
             }
 
             // 4. Important Announcement Banner
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    AnnouncementBanner(
-                        onClick = {
-                            showMessage("मंडळ सूचना फलक उघडला")
-                        }
-                    )
+            if (announcement != null) {
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        AnnouncementBanner(
+                            announcement = announcement,
+                            onClick = {
+                                showMessage("मंडळ सूचना: ${announcement.title}")
+                            }
+                        )
+                    }
                 }
             }
 
@@ -290,6 +300,7 @@ fun HomeScreen(
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     TodayScheduleSection(
+                        events = todaySchedule,
                         onViewAllClick = {
                             onNavigateToEvents()
                         },
@@ -300,12 +311,13 @@ fun HomeScreen(
                 }
             }
 
-            // 6. Recent Activity & Transactions
+            // 7. Recent Activity & Transactions
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     RecentActivitySection(
+                        activities = recentActivities,
                         onViewAllClick = {
-                            showMessage("सर्व व्यवहार व नोंदींची यादी")
+                            onNavigateToDonations()
                         },
                         onItemClick = { act ->
                             showMessage("${act.title}: ₹${act.amount?.toInt() ?: 0}")

@@ -50,50 +50,8 @@ import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun defaultRecentActivities(): List<RecentActivity> {
-    return listOf(
-        RecentActivity(
-            id = "act_1",
-            title = "रमेश बाळकृष्ण पाटील",
-            subtitle = "पावती क्र. #१०४ • ऑनलाईन UPI",
-            amount = 5001.0,
-            isDonation = true,
-            category = "देणगी",
-            timeAgo = "१० मि. पूर्वी"
-        ),
-        RecentActivity(
-            id = "act_2",
-            title = "मंडप विद्युत रोषणाई आगाऊ रक्कम",
-            subtitle = "प्रकाश डेकोरेटर्स • व्हाऊचर #१८",
-            amount = 12500.0,
-            isDonation = false,
-            category = "खर्च",
-            timeAgo = "४५ मि. पूर्वी"
-        ),
-        RecentActivity(
-            id = "act_3",
-            title = "साई समर्थ इंडस्ट्रीज",
-            subtitle = "पावती क्र. #१०३ • रोख देणगी",
-            amount = 21000.0,
-            isDonation = true,
-            category = "देणगी",
-            timeAgo = "२ तास पूर्वी"
-        ),
-        RecentActivity(
-            id = "act_4",
-            title = "पूजा साहित्य व दुर्वा-हार खरेदी",
-            subtitle = "श्री गुरुदेव पूजा भंडार • रोख",
-            amount = 2450.0,
-            isDonation = false,
-            category = "खर्च",
-            timeAgo = "४ तास पूर्वी"
-        )
-    )
-}
-
-@Composable
 fun RecentActivitySection(
-    activities: List<RecentActivity> = defaultRecentActivities(),
+    activities: List<RecentActivity> = emptyList(),
     modifier: Modifier = Modifier,
     onViewAllClick: () -> Unit = {},
     onItemClick: (RecentActivity) -> Unit = {}
@@ -181,21 +139,36 @@ fun RecentActivitySection(
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(FestiveBorderLight))
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                filteredActivities.forEachIndexed { index, item ->
-                    ActivityRowItem(
-                        item = item,
-                        currencyFormatter = currencyFormatter,
-                        onClick = { onItemClick(item) }
+            if (filteredActivities.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "कोणतीही नोंद उपलब्ध नाही",
+                        color = TextSecondaryLight,
+                        fontSize = 13.sp
                     )
-                    if (index < filteredActivities.size - 1) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .height(1.dp)
-                                .background(Color(0xFFF4ECE4))
+                }
+            } else {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    filteredActivities.forEachIndexed { index, item ->
+                        ActivityRowItem(
+                            item = item,
+                            currencyFormatter = currencyFormatter,
+                            onClick = { onItemClick(item) }
                         )
+                        if (index < filteredActivities.size - 1) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(1.dp)
+                                    .background(Color(0xFFF4ECE4))
+                            )
+                        }
                     }
                 }
             }

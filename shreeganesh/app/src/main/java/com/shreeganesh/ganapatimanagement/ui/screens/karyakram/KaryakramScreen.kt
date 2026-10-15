@@ -75,7 +75,6 @@ import com.shreeganesh.ganapatimanagement.model.FestivalDayInfo
 import com.shreeganesh.ganapatimanagement.model.KaryakramCategory
 import com.shreeganesh.ganapatimanagement.model.KaryakramItem
 import com.shreeganesh.ganapatimanagement.model.getFestivalDaysList
-import com.shreeganesh.ganapatimanagement.model.getSampleKaryakramList
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBackgroundLight
 import com.shreeganesh.ganapatimanagement.ui.theme.FestiveBorderLight
 import com.shreeganesh.ganapatimanagement.ui.theme.MarigoldGold
@@ -92,12 +91,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun KaryakramScreen(
     modifier: Modifier = Modifier,
-    initialKaryakramList: List<KaryakramItem> = remember { getSampleKaryakramList() },
+    karyakramList: List<KaryakramItem> = emptyList(),
+    onAddKaryakram: (KaryakramItem) -> Unit = {},
+    onUpdateKaryakramStatus: (String, EventStatus) -> Unit = { _, _ -> },
+    onDeleteKaryakram: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
-    onKaryakramListUpdated: (List<KaryakramItem>) -> Unit = {},
     onPlayAarti: (String) -> Unit = {}
 ) {
-    val karyakramList = remember { mutableStateListOf<KaryakramItem>().apply { addAll(initialKaryakramList) } }
     val festivalDays = remember { getFestivalDaysList() }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -738,12 +738,8 @@ fun KaryakramScreen(
                                 }
                             },
                             onStatusChange = { newStatus ->
-                                val index = karyakramList.indexOfFirst { it.id == item.id }
-                                if (index != -1) {
-                                    karyakramList[index] = item.copy(status = newStatus)
-                                    onKaryakramListUpdated(karyakramList.toList())
-                                    showMessage("${item.title} ची स्थिती अपडेट केली")
-                                }
+                                onUpdateKaryakramStatus(item.id, newStatus)
+                                showMessage("${item.title} ची स्थिती अपडेट केली")
                             }
                         )
                     }
@@ -758,8 +754,7 @@ fun KaryakramScreen(
             sheetState = addSheetState,
             onDismissRequest = { showAddKaryakramSheet = false },
             onKaryakramAdded = { newItem ->
-                karyakramList.add(0, newItem)
-                onKaryakramListUpdated(karyakramList.toList())
+                onAddKaryakram(newItem)
                 showAddKaryakramSheet = false
                 showMessage("✨ '${newItem.title}' उत्सव पत्रिकेत जोडले गेले!")
             }
@@ -772,13 +767,9 @@ fun KaryakramScreen(
             item = detailItem,
             onDismissRequest = { selectedItemForDetails = null },
             onStatusToggle = { targetItem, newStatus ->
-                val index = karyakramList.indexOfFirst { it.id == targetItem.id }
-                if (index != -1) {
-                    karyakramList[index] = targetItem.copy(status = newStatus)
-                    selectedItemForDetails = karyakramList[index]
-                    onKaryakramListUpdated(karyakramList.toList())
-                    showMessage("कार्यक्रमाची स्थिती बदलली: ${newStatus.marathiTitle}")
-                }
+                onUpdateKaryakramStatus(targetItem.id, newStatus)
+                selectedItemForDetails = targetItem.copy(status = newStatus)
+                showMessage("कार्यक्रमाची स्थिती बदलली: ${newStatus.marathiTitle}")
             },
             onPlayAarti = { aartiId ->
                 selectedItemForDetails = null

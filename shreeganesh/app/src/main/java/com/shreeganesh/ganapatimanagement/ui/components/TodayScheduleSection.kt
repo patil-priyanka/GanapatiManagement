@@ -43,54 +43,8 @@ import com.shreeganesh.ganapatimanagement.ui.theme.TextSecondaryLight
 import com.shreeganesh.ganapatimanagement.ui.theme.VermilionRed
 
 @Composable
-fun defaultAartiSchedule(): List<AartiEvent> {
-    return listOf(
-        AartiEvent(
-            id = "aarti_1",
-            title = "Morning Aarti & Naivedya",
-            marathiTitle = "सकाळची महाआरती व नैवेद्य",
-            time = "०८:०० AM",
-            location = "मुख्य मंडप",
-            isCompleted = true,
-            prasadDetails = "उकडीचे मोदक महाप्रसाद",
-            host = "पाटील कुटुंब"
-        ),
-        AartiEvent(
-            id = "aarti_2",
-            title = "Afternoon Mahaprasad",
-            marathiTitle = "दुपारचे महाप्रसाद वाटप",
-            time = "०१:०० PM",
-            location = "प्रसाद मंडप",
-            isCompleted = true,
-            prasadDetails = "सर्व भाविकांसाठी अन्नदान",
-            host = "युवा समिती"
-        ),
-        AartiEvent(
-            id = "aarti_3",
-            title = "Evening Maha Aarti",
-            marathiTitle = "संध्याकाळची महाआरती व भजन",
-            time = "०७:३० PM",
-            location = "मुख्य मंडप",
-            isNext = true,
-            prasadDetails = "लाडू व पंचखाद्य प्रसाद",
-            host = "आमदार श्री. मोरे यांच्या हस्ते"
-        ),
-        AartiEvent(
-            id = "aarti_4",
-            title = "Cultural Event & Dhol Tasha",
-            marathiTitle = "सांस्कृतिक कार्यक्रम व ढोल ताशा",
-            time = "०९:०० PM",
-            location = "उत्सव रंगमंच",
-            isNext = false,
-            prasadDetails = "बालकलाकार नृत्य व संगीत",
-            host = "कला मंडळ"
-        )
-    )
-}
-
-@Composable
 fun TodayScheduleSection(
-    events: List<AartiEvent> = defaultAartiSchedule(),
+    events: List<AartiEvent> = emptyList(),
     modifier: Modifier = Modifier,
     onViewAllClick: () -> Unit = {},
     onEventClick: (AartiEvent) -> Unit = {}
@@ -134,15 +88,38 @@ fun TodayScheduleSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Schedule items
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            events.forEach { event ->
-                ScheduleItemCard(
-                    event = event,
-                    onClick = { onEventClick(event) }
-                )
+        if (events.isEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(FestiveBorderLight))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "आज कोणतेही कार्यक्रम नियोजित नाहीत",
+                        color = TextSecondaryLight,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                events.forEach { event ->
+                    ScheduleItemCard(
+                        event = event,
+                        onClick = { onEventClick(event) }
+                    )
+                }
             }
         }
     }
