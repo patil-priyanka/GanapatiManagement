@@ -1,0 +1,40 @@
+package com.shreeganesh.ganapatimanagement.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.shreeganesh.ganapatimanagement.data.local.entity.MemberEntity
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface MemberDao {
+    @Query("SELECT * FROM members ORDER BY createdAtTimestamp ASC")
+    fun getAllMembers(): Flow<List<MemberEntity>>
+
+    @Query("SELECT * FROM members WHERE id = :id LIMIT 1")
+    suspend fun getMemberById(id: String): MemberEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMember(member: MemberEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMembers(members: List<MemberEntity>)
+
+    @Update
+    suspend fun updateMember(member: MemberEntity)
+
+    @Delete
+    suspend fun deleteMember(member: MemberEntity)
+
+    @Query("DELETE FROM members WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT COUNT(*) FROM members")
+    fun getMemberCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM members")
+    suspend fun getCount(): Int
+}

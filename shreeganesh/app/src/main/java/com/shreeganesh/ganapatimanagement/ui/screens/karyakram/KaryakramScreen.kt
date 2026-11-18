@@ -95,7 +95,7 @@ fun KaryakramScreen(
     onAddKaryakram: (KaryakramItem) -> Unit = {},
     onUpdateKaryakramStatus: (String, EventStatus) -> Unit = { _, _ -> },
     onDeleteKaryakram: (String) -> Unit = {},
-    onBackClick: () -> Unit = {},
+    onBackClick: () -> Unit = {}, 
     onPlayAarti: (String) -> Unit = {}
 ) {
     val festivalDays = remember { getFestivalDaysList() }
